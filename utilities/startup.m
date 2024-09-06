@@ -1,0 +1,10 @@
+clear all;
+close all;;
+clc;
+% Populate EOL parameters.
+EOL_Parameters;
+DataDictionary;
+
+assignin("base","ModelType",2);
+assignin("base","ControlVariant",1);
+ControlDesign;

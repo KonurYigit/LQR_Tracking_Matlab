@@ -1,0 +1,61 @@
+close all;
+format long;
+clc;
+%% Figure handles
+hndlFig     = figure;
+hndlAxes    = axes(hndlFig);
+% Create Dubins connection and path segments.
+PathConnObj = dubinsConnection("MinTurningRadius",4);
+
+%% Path Parameters
+startPoseStraight = [25 0 pi/2];
+endPoseStraight    = [25 25 pi/2];
+endPoseStraight2 = [25 0 -pi/2];
+startPoseStraight2    = [25 25 -pi/2];
+startPoseTurn     = [25 25 pi/2];
+endPoseTurn       = [25 25 3*pi/2];
+pathlength        = .1;% This parameter gives the path segment length.
+smoothDiscLen     = 1;% Smoothing parameter.
+
+%% Create Path
+PathSegObj = PathConnObj.connect(startPoseTurn, endPoseTurn);
+PathSegObjStraight = PathConnObj.connect(startPoseStraight, endPoseStraight);
+PathSegObjStraight2= PathConnObj.connect(startPoseStraight2, endPoseStraight2);
+% Create Control Points for path smoothing. poses stores the these control
+% points.
+poses          = interpolate(PathSegObj{1},0:pathlength:PathSegObj{1}.Length);
+posesStraight  = interpolate(PathSegObjStraight{1},0:pathlength:PathSegObjStraight{1}.Length);
+posesStraight2 = interpolate(PathSegObjStraight2{1},0:pathlength:PathSegObjStraight{1}.Length);
+%% Smooth the Path and Create Segments For Control.
+%refpathobj stores the smoothed path object.
+refPathObj = referencePathFrenet(poses(1:length(poses)-1,:), ...
+    "DiscretizationDistance",.05);%,"DiscretizationDistance",smoothDiscLen);
+posesTurn  = interpolate(refPathObj,0:pathlength:refPathObj.PathLength);
+%% Visualize
+show(PathSegObj{1},"Parent",hndlAxes);
+show(PathSegObjStraight{1},"Parent",hndlAxes,"Positions","start");
+hold on;
+ scatter(hndlAxes,poses(:,1), poses(:,2), 'o', ...
+     'MarkerFaceColor', 'b','DisplayName',"Smoothing Control Points");
+ scatter(hndlAxes,posesTurn(:,1), posesTurn(:,2), 'o', ...
+     'MarkerFaceColor', 'y','DisplayName',"Smoothed Path Segments", ...
+     "MarkerFaceAlpha",0.3);
+axis equal;
+grid minor;
+title("Global Path Plan");
+xlim([15 35]);
+ylim([-5 40]);
+
+%% Combine Path Segments
+% We combine path segments that is straight and turn segments.
+
+posesAll = [posesStraight(1:end-1,:) zeros(length(posesStraight)-1,2,"double") ...
+            posesStraight(1:end-1,2); ...
+            posesTurn(1:end-1,:); ...
+            posesStraight2(1:end-1,:) zeros(length(posesStraight2)-1,2,"double") ...
+            posesStraight2(1:end-1,2)];
+posesAll(length(posesStraight):end,6) = posesAll(length(posesStraight):end,6) + ...
+                                        posesStraight(end,2);
+VehicleInitPose = struct("X",EOL_Vehicle_InitX,"Y",EOL_Vehicle_InitY, ...
+                         "Yaw",EOL_Vehicle_INITR);
+save("Data/PathPlanData.mat","posesAll","VehicleInitPose","-mat");

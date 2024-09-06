@@ -1,0 +1,36 @@
+%% End Of Line Parameters List.
+EOL_Vehicle_Cf = 44500.663;
+EOL_Vehicle_Cr = 56500.663;
+EOL_Vehicle_lr = 1.1;
+EOL_Vehicle_lf = 1.4;
+EOL_Vehicle_Iz = 2000;
+EOL_Vehicle_M  = 1090;
+EOL_Vehicle_Vx = 1;
+EOL_Vehicle_Len= 3.0;
+EOL_Vehicle_Width = 2.2;
+%% Initial Parameters
+EOL_Vehicle_InitX = 25; % Initial Position X
+EOL_Vehicle_InitY = 0.1; % Initial Position Y
+EOL_Vehicle_INITR = pi/2; % Initial Yaw Angle;
+
+EOL_Vehicle_Speed = 1;
+%% Linear Vehicle Model Parameters Combined
+EOL_Vehicle_Ap = zeros(4);
+EOL_Vehicle_Ap(1,2) = 1;
+EOL_Vehicle_Ap(2,2) = -2*(EOL_Vehicle_Cf+EOL_Vehicle_Cr)/(EOL_Vehicle_Vx*EOL_Vehicle_M); 
+EOL_Vehicle_Ap(2,4) = -(EOL_Vehicle_Vx + 2*(EOL_Vehicle_Cf*EOL_Vehicle_lf-EOL_Vehicle_Cr*EOL_Vehicle_lr) ...
+                      /(EOL_Vehicle_Vx*EOL_Vehicle_M));
+EOL_Vehicle_Ap(3,4) = 1;
+EOL_Vehicle_Ap(4,2) = 2*(-EOL_Vehicle_Cf*EOL_Vehicle_lf+EOL_Vehicle_Cr*EOL_Vehicle_lr) ...
+                      /(EOL_Vehicle_Vx*EOL_Vehicle_Iz);
+EOL_Vehicle_Ap(4,4) = -2*(EOL_Vehicle_Cf*EOL_Vehicle_lf^2+EOL_Vehicle_Cr*EOL_Vehicle_lr^2) ...
+                      /(EOL_Vehicle_Vx*EOL_Vehicle_Iz);
+
+EOL_Vehicle_Bp      = zeros(4,1);
+EOL_Vehicle_Bp(2,1) = 2*EOL_Vehicle_Cf/EOL_Vehicle_M;
+EOL_Vehicle_Bp(4,1) = (2*EOL_Vehicle_Cf*EOL_Vehicle_lf)/EOL_Vehicle_Iz;
+
+EOL_Vehicle_Cp      = eye(4);
+EOL_Vehicle_Dp      = zeros(4,1);
+
+EOL_Vehicle_StateNames = {"LateralVelocity","LateralAcceleration","YawRate","YawRateChange"};

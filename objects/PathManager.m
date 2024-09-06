@@ -1,0 +1,169 @@
+classdef PathManager < matlab.System
+    % untitled Add summary here
+    %
+    % NOTE: When renaming the class name untitled, the file name
+    % and constructor name must be updated to use the class name.
+    %
+    % This template includes most, but not all, possible properties,
+    % attributes, and methods that you can implement for a System object.
+
+    % Public, tunable properties
+    properties
+
+    end
+
+    % Public, non-tunable properties
+    properties (Nontunable)
+
+    end
+
+    % Discrete state properties
+    properties (DiscreteState)
+
+    end
+
+    % Pre-computed constants or internal states
+    properties (Access = private)
+        currentX;
+        currentY;
+        currentYaw;
+        initX;
+        initY;
+        initR;% Initial Yaw.
+        currentPathPoint;
+        currentind;
+
+        pathData;  % data loaded from file.
+        pathObj;   % Path object created based on pathData.
+        pathTempObj;%Temporary path Object for closest point calcultion, hold windowed values.
+        windowlen; %Length Of Path Search.
+        windowbacklen;
+
+        Out;%output
+        
+    end
+
+    methods
+        % Constructor
+        function obj = PathManager(varargin)
+            % Support name-value pair arguments when constructing object
+            setProperties(obj,nargin,varargin{:})
+        end
+    end
+
+    methods (Access = protected)
+        %% Common functions
+        function setupImpl(obj)
+            % Perform one-time calculations, such as computing constants
+        end
+
+        function PathManagerOutput = stepImpl(obj,vehicleIn)
+            obj.currentX   = vehicleIn.X;
+            obj.currentY   = vehicleIn.Y;
+            %obj.currentYaw = VehicleIn.Theta;
+            %a1 = obj.currentX
+            %a2 = obj.currentY
+            obj.currentPathPoint = ...
+                obj.pathObj.closestPointsToSequence([obj.currentX obj.currentY], ...
+                [obj.pathObj.SegmentParameters(obj.currentind,6)-.2,...
+                 obj.pathObj.SegmentParameters(obj.currentind,6)+.6]);
+            %aa = obj.currentPathPoint For debugging.
+            %aa = find((obj.pathObj.SegmentParameters(:,6)==obj.currentPathPoint(6))==true)
+            [temp,obj.currentind]  = min(abs(obj.pathObj.SegmentParameters(:,6) ...
+                - obj.currentPathPoint(6)));
+            %bb = obj.currentind% For debugging
+            obj.Out.ClosestPointX = obj.currentPathPoint(1);
+            obj.Out.ClosestPointY = obj.currentPathPoint(2);
+            obj.Out.ClosestPointYaw = obj.currentPathPoint(3);
+            obj.Out.ClosestPointK = obj.currentPathPoint(4);
+            obj.Out.ClosestPointKdot = obj.currentPathPoint(5);
+            obj.Out.ClosestPointS = obj.currentPathPoint(6);
+
+            PathManagerOutput = obj.Out;
+        end
+
+        function resetImpl(obj)
+            % Initialize / reset internal or discrete properties
+            obj.pathData = load("./Data/PathPlanData.mat");
+            obj.initX    = obj.pathData.VehicleInitPose.X;
+            obj.initY    = obj.pathData.VehicleInitPose.X;
+            obj.initR    = obj.pathData.VehicleInitPose.Yaw;
+            obj.pathObj  = referencePathFrenet(obj.pathData.posesAll(:,1:3));
+            obj.currentPathPoint = ...
+                obj.pathObj.closestPointsToSequence([obj.initX obj.initY],[0,1]);
+            obj.currentind  = find(obj.pathObj.SegmentParameters(:,6) ...
+                ==obj.currentPathPoint(6));
+            obj.windowlen = 1;
+            obj.windowbacklen = 0.5;
+
+            obj.Out = struct("ClosestPointX", 0., ...
+                             "ClosestPointY", 0., ... 
+                             "ClosestPointYaw", 0., ...
+                             "ClosestPointK", 0., ...
+                             "ClosestPointKdot", 0., ...
+                             "ClosestPointS", 0.);
+        end
+
+        %% Backup/restore functions
+        function s = saveObjectImpl(obj)
+            % Set properties in structure s to values in object obj
+
+            % Set public properties and states
+            s = saveObjectImpl@matlab.System(obj);
+
+            % Set private and protected properties
+            %s.myproperty = obj.myproperty;
+        end
+
+        function loadObjectImpl(obj,s,wasLocked)
+            % Set properties in object obj to values in structure s
+
+            % Set private and protected properties
+            % obj.myproperty = s.myproperty; 
+
+            % Set public properties and states
+            loadObjectImpl@matlab.System(obj,s,wasLocked);
+        end
+
+        %% Advanced functions
+        function validateInputsImpl(obj,u)
+            % Validate inputs to the step method at initialization
+        end
+
+        function validatePropertiesImpl(obj)
+            % Validate related or interdependent property values
+        end
+
+        function ds = getDiscreteStateImpl(obj)
+            % Return structure of properties with DiscreteState attribute
+            ds = struct([]);
+        end
+
+        function processTunedPropertiesImpl(obj)
+            % Perform actions when tunable properties change
+            % between calls to the System object
+        end
+
+        function flag = isInputSizeMutableImpl(obj,index)
+            % Return false if input size cannot change
+            % between calls to the System object
+            flag = false;
+        end
+
+        function flag = isInactivePropertyImpl(obj,prop)
+            % Return false if property is visible based on object 
+            % configuration, for the command line and System block dialog
+            flag = false;
+        end
+        function sz_1 = getOutputSizeImpl(obj)
+            sz_1 = [1 1];
+        end 
+        function out = getOutputDataTypeImpl(obj)
+            out = "Bus: PathManagerOut";
+        end
+        function c1 = isOutputComplexImpl(obj)
+            c1 = false;
+        end
+
+    end
+end
