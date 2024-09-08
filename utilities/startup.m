@@ -5,6 +5,6 @@ clc;
 EOL_Parameters;
 DataDictionary;
 
-assignin("base","ModelType",1);
+assignin("base","ModelType",2);
 assignin("base","ControlVariant",2);
 ControlDesign;

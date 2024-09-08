@@ -134,6 +134,11 @@ classdef PostProcessing < matlab.System
             obj.hndlAxes.XMinorGrid = "on";
             obj.hndlAxes.YMinorGrid = "on";
             obj.hndlAxes.MinorGridLineStyle = "-";
+            obj.hndlAxes2.XMinorGrid = "on";
+            obj.hndlAxes2.YMinorGrid = "on";
+            obj.hndlAxes2.MinorGridLineStyle = "-";
+
+            
 
             obj.counter = 0;
             scatter(obj.hndlAxes,obj.PathStore.posesAll(:,1), ...
@@ -194,9 +199,13 @@ classdef PostProcessing < matlab.System
             
             obj.hndlAxes.MinorGridLineStyle = "-";
             obj.hndlAxes.NextPlot = "add";
+
             obj.h1 = plot(obj.hndlAxes,obj.vehicleControlPoint(1,:) , ...
                 obj.vehicleControlPoint(2,:), ...
                 "Color","blue");
+            
+            pos1 = get(obj.hndlFig2,'Position'); % get position of Figure(2) 
+            set(gcf,'Position', pos1 - [pos1(3),0,0,0]) 
             % obj.h2 = plot(obj.hndlAxes,[obj.vehicleControlPoint(1,2), ...
             %     obj.vehicleControlPoint(1,3)], ...
             %     [obj.vehicleControlPoint(2,2), ...
