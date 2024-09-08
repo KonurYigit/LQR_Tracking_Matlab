@@ -67,14 +67,16 @@ classdef PathManager < matlab.System
                 obj.pathObj.closestPointsToSequence([obj.currentX obj.currentY], ...
                 [obj.pathObj.SegmentParameters(obj.currentind,6)-.2,...
                  obj.pathObj.SegmentParameters(obj.currentind,6)+.6]);
+            aa = obj.currentPathPoint
             %aa = obj.currentPathPoint For debugging.
             %aa = find((obj.pathObj.SegmentParameters(:,6)==obj.currentPathPoint(6))==true)
             [temp,obj.currentind]  = min(abs(obj.pathObj.SegmentParameters(:,6) ...
                 - obj.currentPathPoint(6)));
-            %bb = obj.currentind% For debugging
+            aa = obj.currentind
+            obj.Out.ClosestPointYaw = obj.pathObj.Waypoints(obj.currentind,3);
             obj.Out.ClosestPointX = obj.currentPathPoint(1);
             obj.Out.ClosestPointY = obj.currentPathPoint(2);
-            obj.Out.ClosestPointYaw = obj.currentPathPoint(3);
+            
             obj.Out.ClosestPointK = obj.currentPathPoint(4);
             obj.Out.ClosestPointKdot = obj.currentPathPoint(5);
             obj.Out.ClosestPointS = obj.currentPathPoint(6);
@@ -85,10 +87,12 @@ classdef PathManager < matlab.System
         function resetImpl(obj)
             % Initialize / reset internal or discrete properties
             obj.pathData = load("./Data/PathPlanData.mat");
+            %aa = obj.pathData;
             obj.initX    = obj.pathData.VehicleInitPose.X;
             obj.initY    = obj.pathData.VehicleInitPose.X;
             obj.initR    = obj.pathData.VehicleInitPose.Yaw;
             obj.pathObj  = referencePathFrenet(obj.pathData.posesAll(:,1:3));
+            %aa = obj.pathObj;
             obj.currentPathPoint = ...
                 obj.pathObj.closestPointsToSequence([obj.initX obj.initY],[0,1]);
             obj.currentind  = find(obj.pathObj.SegmentParameters(:,6) ...

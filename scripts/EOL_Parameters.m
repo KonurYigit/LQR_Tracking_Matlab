@@ -2,14 +2,14 @@
 EOL_Vehicle_Cf = 44500.663;
 EOL_Vehicle_Cr = 56500.663;
 EOL_Vehicle_lr = 1.1;
-EOL_Vehicle_lf = 1.4;
-EOL_Vehicle_Iz = 2000;
+EOL_Vehicle_lf = 1.1;
+EOL_Vehicle_Iz = 1200;
 EOL_Vehicle_M  = 1090;
 EOL_Vehicle_Vx = 1;
 EOL_Vehicle_Len= 3.0;
 EOL_Vehicle_Width = 2.2;
 %% Initial Parameters
-EOL_Vehicle_InitX = 25; % Initial Position X
+EOL_Vehicle_InitX = 24.5; % Initial Position X
 EOL_Vehicle_InitY = 0.1; % Initial Position Y
 EOL_Vehicle_INITR = pi/2; % Initial Yaw Angle;
 

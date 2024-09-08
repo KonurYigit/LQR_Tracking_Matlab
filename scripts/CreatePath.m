@@ -56,6 +56,7 @@ posesAll = [posesStraight(1:end-1,:) zeros(length(posesStraight)-1,2,"double") .
             posesStraight2(1:end-1,2)];
 posesAll(length(posesStraight):end,6) = posesAll(length(posesStraight):end,6) + ...
                                         posesStraight(end,2);
+posesAll(:,3) = wrapTo2Pi(posesAll(:,3));
 VehicleInitPose = struct("X",EOL_Vehicle_InitX,"Y",EOL_Vehicle_InitY, ...
                          "Yaw",EOL_Vehicle_INITR);
 save("Data/PathPlanData.mat","posesAll","VehicleInitPose","-mat");

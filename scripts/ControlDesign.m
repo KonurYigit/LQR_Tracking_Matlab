@@ -43,9 +43,9 @@ control_syss= ss(Ae,B1e,Ces,De);
 control_sysd= c2d(control_sys,0.01,"zoh");
 % Tuning Parameters
 Q1 = [2000 0 0 0;0 250 0 0;0 0 3500 0;0 0 0 100];
-Q2 = [1850 0 0 0;0 500 0 0;0 0 2500 0;0 0 0 1500];
+Q2 = [20 0 0 0;0 0.5 0 0;0 0 38.5 0;0 0 0 20.5];
 Q = Q2;
-R = 100;
+R = 5;
 Qs= [1750 0 0 0 0;0 250 0 0 0;0 0 2500 0 0;0 0 0 100 0;0 0 0 0 1];
 Kgain = lqr(control_sys,Q,R);
 Ksgain= lqi(control_syss,Qs,R);

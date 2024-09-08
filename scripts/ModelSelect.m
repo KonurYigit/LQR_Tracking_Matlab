@@ -5,10 +5,11 @@ list = {"NonlinearDynamicsModel","NonlinearKinematicsModel", "LinearDynamicsMode
 switch indx
     case 1
       assignin("base","ModelType",1);
+      set_param('top_model','SimulationCommand','Update');
       
     case 2
       assignin("base","ModelType",2);
-       
+      set_param('top_model','SimulationCommand','Update');
     case 3
       assignin("base","ModelType",3);
 
